@@ -14,7 +14,7 @@ D = 3  # DIMENSIONALITY
 delta = 0.001  # DISTURBANCE THRESHOLD
 maxIterations = 1000  # ITERATIONS ALLOWED
 
-# BS Range, DC Range, DC Flying height,
+# BS Range, DC Range, BS_Pathloss, DC_Pathloss
 lowerB = [100, 100, 50]  # LOWER BOUND (IN ALL DIMENSIONS)
 upperB = [1000, 200, 500]  # UPPER BOUND (IN ALL DIMENSIONS)
 
@@ -44,7 +44,7 @@ for itr in range(maxIterations):
         # FIND BEST NEIGHBOUR
         left = (i - 1) % N
         right = (i + 1) % N
-        bNeighbour = right if fitness[right] < fitness[left] else left
+        bNeighbour = right if fitness[right] > fitness[left] else left
 
         for d in range(D):  # UPDATE EACH DIMENSION SEPARATELY
             if np.random.rand() < delta:
