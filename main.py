@@ -1,5 +1,7 @@
 import numpy as np
 
+#Testing out Git commit and push from Ubuntu
+#Test => 1
 
 # FITNESS FUNCTION
 def f(x):  # x IS A VECTOR REPRESENTING ONE FLY
