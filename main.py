@@ -1,7 +1,5 @@
 import math
-
 import numpy as np
-
 import matplotlib.pyplot as plt
 
 thita_opt = 0.35499997
@@ -12,7 +10,7 @@ B = 4.14
 P_LoS = 0.1
 P_NLoS = 21
 f_c = 2.4
-c = 300
+c = 3000
 A_1 = P_LoS - P_NLoS
 B_1 = 20 * math.log10((4 * math.pi * f_c) / c) + P_LoS
 
@@ -49,7 +47,7 @@ for i in range(N):
 for itr in range(maxIterations):
     for i in range(N):  # EVALUATION
         fitness[i] = f(X[i,])
-    s = np.argmin(fitness)  # FIND BEST FLY
+    s = np.argmax(fitness)  # FIND BEST FLY
 
     if itr % 100 == 0:  # PRINT BEST FLY EVERY 100 ITERATIONS
         print("Iteration:", itr, "\tBest fly index:", s,
@@ -70,7 +68,7 @@ for itr in range(maxIterations):
                 continue;
 
             u = np.random.rand()
-            X[i, d] = X[bNeighbour, d] + u * (X[bNeighbour, d] - X[i, d])
+            X[i, d] = X[bNeighbour, d] + u * (X[s, d] - X[i, d])
 
             # OUT OF BOUND CONTROL
             if X[i, d] < lowerB[d] or X[i, d] > upperB[d]:
