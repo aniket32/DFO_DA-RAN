@@ -1,8 +1,6 @@
 import math
-import numpy as np
 
-# Testing out Git commit and push from Ubuntu
-# Test => 2
+import numpy as np
 
 thita_opt = 0.35499997
 a = 4.88
@@ -18,10 +16,9 @@ B_1 = 20 * math.log10((4 * math.pi * f_c) / c) + P_LoS
 
 
 # FITNESS FUNCTION
-# PL_th is the x
+# PL_th(Pathloss Threshold) is the x
 def f(x):  # x IS A VECTOR REPRESENTING ONE FLY
     R = 0.0
-
     for i in range(len(x)):
         R = (-(20 * A_1) / (1 + a * math.exp(-b * (((180 / math.pi) * thita_opt) - a))) - (B_1 / 20) + (
                 x[0] / 20)) * math.cos(thita_opt)
