@@ -1,24 +1,41 @@
+import math
 import numpy as np
 
-#Testing out Git commit and push from Ubuntu
-#Test => 2
+# Testing out Git commit and push from Ubuntu
+# Test => 2
+
+thita_opt = 0.35499997
+a = 4.88
+b = 0.43
+A = -23.39
+B = 4.14
+P_LoS = 0.1
+P_NLoS = 21
+f_c = 2.4
+c = 300
+A_1 = P_LoS - P_NLoS
+B_1 = 20 * math.log10((4 * math.pi * f_c) / c) + P_LoS
+
 
 # FITNESS FUNCTION
+# PL_th is the x
 def f(x):  # x IS A VECTOR REPRESENTING ONE FLY
-    sum = 0.0
+    R = 0.0
+
     for i in range(len(x)):
-        sum = x[0] + x[1] + x[2]
-    return sum
+        R = (-(20 * A_1) / (1 + a * math.exp(-b * (((180 / math.pi) * thita_opt) - a))) - (B_1 / 20) + (
+                x[0] / 20)) * math.cos(thita_opt)
+    return R
 
 
 N = 500  # POPULATION SIZE
-D = 3  # DIMENSIONALITY
+D = 1  # DIMENSIONALITY
 delta = 0.001  # DISTURBANCE THRESHOLD
 maxIterations = 1000  # ITERATIONS ALLOWED
 
-# BS Range, DC Range, BS_Pathloss, DC_Pathloss
-lowerB = [100, 100, 50]  # LOWER BOUND (IN ALL DIMENSIONS)
-upperB = [1000, 200, 500]  # UPPER BOUND (IN ALL DIMENSIONS)
+# DC_Pathloss
+lowerB = [0]  # LOWER BOUND (IN ALL DIMENSIONS)
+upperB = [89]  # UPPER BOUND (IN ALL DIMENSIONS)
 
 # INITIALISATION PHASE
 X = np.empty([N, D])  # EMPTY FLIES ARRAY OF SIZE: (N,D)
@@ -65,3 +82,5 @@ s = np.argmax(fitness)  # FIND BEST FLY
 
 print("\nFinal best fitness:\t", fitness[s])
 print("\nBest fly position:\n", X[s,])
+print("\nTotal circumference:\n", 2 * math.pi * fitness[s])
+print("\nHeight:\n", fitness[s] * math.tan(thita_opt))
