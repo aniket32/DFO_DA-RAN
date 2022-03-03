@@ -2,6 +2,8 @@ import math
 
 import numpy as np
 
+import matplotlib.pyplot as plt
+
 thita_opt = 0.35499997
 a = 4.88
 b = 0.43
@@ -75,8 +77,9 @@ for itr in range(maxIterations):
                 X[i, d] = np.random.uniform(lowerB[d], upperB[d])
 
 for i in range(N): fitness[i] = f(X[i,])  # EVALUATION
-s = np.argmax(fitness)  # FIND BEST FLY
+s = np.argmax(fitness)
 
+# FIND BEST FLY
 print("\nFinal best fitness:\t", fitness[s])
 print("\nBest fly position:\n", X[s,])
 print("\nTotal circumference:\n", 2 * math.pi * fitness[s])
