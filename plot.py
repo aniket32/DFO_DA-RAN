@@ -22,3 +22,5 @@ for i, j in zip(x, y):
 # Show Plot
 plt.grid(True)
 plt.show()
+# Saving the plot
+# plt.savefig("Users.png")
