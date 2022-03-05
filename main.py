@@ -1,6 +1,38 @@
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
+# Randomizing the x and y coordinates
+x = np.arange(40)
+y = np.random.randint(20, size=40)
+
+# Plot labels and plot type
+plt.figure(figsize=(10, 5))
+plt.scatter(x, y, color='b', marker='^')
+plt.xlabel("x")
+plt.ylabel("y")
+
+# User Coordinates
+coordinates = []
+for i, j in zip(x, y):
+    coordinates.append((i, j))
+
+# Saving the coordinates to a txt file
+file = open('coordinates.txt', 'w')
+for items in coordinates:
+    line = ' '.join(str(x) for x in items)
+    file.write(line + '\n')
+
+file.close()
+
+# for items in coordinates:
+#     print(items)
+
+# Show Plot
+# plt.grid(True)
+fig1 = plt.gcf()
+# plt.savefig('Users.png')
 
 thita_opt = 0.35499997
 a = 4.88
@@ -14,6 +46,9 @@ c = 3000
 A_1 = P_LoS - P_NLoS
 B_1 = 20 * math.log10((4 * math.pi * f_c) / c) + P_LoS
 
+imgW = 40
+imgH = 20
+
 
 # FITNESS FUNCTION
 # PL_th(Pathloss Threshold) is the x
@@ -25,14 +60,14 @@ def f(x):  # x IS A VECTOR REPRESENTING ONE FLY
     return R
 
 
-N = 500  # POPULATION SIZE
-D = 1  # DIMENSIONALITY
+N = 5  # POPULATION SIZE
+D = 2  # DIMENSIONALITY
 delta = 0.001  # DISTURBANCE THRESHOLD
 maxIterations = 1000  # ITERATIONS ALLOWED
 
 # DC_Pathloss
-lowerB = [0]  # LOWER BOUND (IN ALL DIMENSIONS)
-upperB = [89]  # UPPER BOUND (IN ALL DIMENSIONS)
+lowerB = [0, imgW]  # LOWER BOUND (IN ALL DIMENSIONS)
+upperB = [89, imgH]  # UPPER BOUND (IN ALL DIMENSIONS)
 
 # INITIALISATION PHASE
 X = np.empty([N, D])  # EMPTY FLIES ARRAY OF SIZE: (N,D)
@@ -45,9 +80,12 @@ for i in range(N):
 
 # MAIN DFO LOOP
 for itr in range(maxIterations):
+    # plt.show()
+
     for i in range(N):  # EVALUATION
         fitness[i] = f(X[i,])
     s = np.argmax(fitness)  # FIND BEST FLY
+    print("s",s)
 
     if itr % 100 == 0:  # PRINT BEST FLY EVERY 100 ITERATIONS
         print("Iteration:", itr, "\tBest fly index:", s,
@@ -73,6 +111,25 @@ for itr in range(maxIterations):
             # OUT OF BOUND CONTROL
             if X[i, d] < lowerB[d] or X[i, d] > upperB[d]:
                 X[i, d] = np.random.uniform(lowerB[d], upperB[d])
+
+    rowNo = X[s, 0]
+    colNo = X[s, 1]
+    swarmBestCircle = plt.Circle((rowNo, colNo), 2, color='r')
+
+    # for a, b in zip(rowNo,colNo):
+    #     print(a,b)
+
+    circle = []  # THIS SECTION IS OPTIONAL TO SHOW ALL FLIES
+    for i in range(N):
+        circle.append(plt.Circle((X[i, 1], X[i, 0]), 1.5, color='g'))
+        plt.gca().add_patch(circle[i])
+
+    plt.gca().add_patch(swarmBestCircle)  # ADD THE CIRCLE
+    plt.draw()  # DRAW THE IMAGE AND THE CIRCLE
+    plt.show()
+    plt.axis('off')  # REMOVE THE AXES
+    plt.pause(0.01)  # PAUSE BEFORE THE NEXT ITERATION IN BETWEEN
+    plt.clf()  # CLEAR THE CANVAS
 
 for i in range(N): fitness[i] = f(X[i,])  # EVALUATION
 s = np.argmax(fitness)

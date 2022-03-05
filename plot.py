@@ -1,16 +1,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Extra parameters
-# plt.rcParams["figure.figsize"] = [7, 7]
-# plt.rcParams["figure.autolayout"] = True
-
 # Initialising random points for the users
-x = np.arange(40)
-y = np.random.randint(20, size=40)
+x = np.arange(5)
+y = np.random.randint(15, size=5)
 
+ax = plt.subplot()
 # Plot labels and plot type
-plt.scatter(x, y, color='b', marker='^')
+# plt.scatter(x, y, color='b', marker='^')
+ax.scatter(x, y, color='b')
 plt.xlabel("x")
 plt.ylabel("y")
 
@@ -24,8 +22,13 @@ for items in coordinates:
     line = ' '.join(str(x) for x in items)
     file.write(line + '\n')
 
-# for items in coordinates:
-#     print(items)
+file.close()
+
+for a, b in coordinates:
+    cir = plt.Circle((a,b), 1.5, color='r', fill=False)
+    ax.set_aspect('equal', adjustable='datalim')
+    ax.add_patch(cir)
+
 
 # Show Plot
 # plt.grid(True)
