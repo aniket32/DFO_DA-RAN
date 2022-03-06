@@ -13,6 +13,7 @@ ax.scatter(x, y, color='b', marker='^')
 plt.xlabel("x")
 plt.ylabel("y")
 
+
 # User Coordinates
 coordinates = []
 for i, j in zip(x, y):
@@ -25,6 +26,8 @@ for items in coordinates:
     file.write(line + '\n')
 
 file.close()
+
+
 
 # Parameters
 thita_opt = 0.35499997
@@ -53,14 +56,14 @@ def f(x):  # x IS A VECTOR REPRESENTING ONE FLY
     return R
 
 
-N = 10  # POPULATION SIZE
-D = 3  # DIMENSIONALITY
+N = 10 # POPULATION SIZE
+D = 2  # DIMENSIONALITY
 delta = 0.001  # DISTURBANCE THRESHOLD
 maxIterations = 500  # ITERATIONS ALLOWED
 
 # DC_Pathloss
-lowerB = [0, 0, 5]  # LOWER BOUND (IN ALL DIMENSIONS)
-upperB = [89, 89, 10]  # UPPER BOUND (IN ALL DIMENSIONS)
+lowerB = [0, 0]  # LOWER BOUND (IN ALL DIMENSIONS)
+upperB = [89, 89]  # UPPER BOUND (IN ALL DIMENSIONS)
 
 # INITIALISATION PHASE
 X = np.empty([N, D])  # EMPTY FLIES ARRAY OF SIZE: (N,D)
@@ -105,6 +108,7 @@ for itr in range(maxIterations):
     rowNo = X[s, 1]
     colNo = X[s, 0]
     swarmBestCircle = plt.Circle((rowNo, colNo), 1, color='r')
+    # Coverage Range of the Drones
     cir = plt.Circle((rowNo, colNo), 10, color='b', fill=False)
     ax.set_aspect('equal', adjustable='datalim')
     ax.add_patch(cir)
@@ -116,15 +120,18 @@ for itr in range(maxIterations):
     for i in range(N):
         circle.append(plt.Circle((X[i, 1], X[i, 0]), 1, color='g'))
         plt.gca().add_patch(circle[i])
+        # Coverage Radius of the Drones
         cir = plt.Circle((X[i,1], X[i,0]), 10, color='b', fill=False)
         ax.set_aspect('equal', adjustable='datalim')
         ax.add_patch(cir)
 
     plt.gca().add_patch(swarmBestCircle)  # ADD THE CIRCLE
-    plt.show(block=False)
-    plt.pause(0.01)  # PAUSE BEFORE THE NEXT ITERATION IN BETWEEN
+    plt.show(block = False)
+    plt.draw()  # DRAW THE IMAGE AND THE CIRCLE # REMOVE THE AXES
+    plt.pause(0.01) # PAUSE BEFORE THE NEXT ITERATION IN BETWEEN
     # plt.clf()  # CLEAR THE CANVAS
     # ax.grid(True)
+
 
 for i in range(N): fitness[i] = f(X[i,])  # EVALUATION
 s = np.argmax(fitness)
@@ -134,3 +141,4 @@ print("\nFinal best fitness:\t", fitness[s])
 print("\nBest fly position:\n", X[s,])
 print("\nTotal circumference:\n", 2 * math.pi * fitness[s])
 print("\nHeight:\n", fitness[s] * math.tan(thita_opt))
+
