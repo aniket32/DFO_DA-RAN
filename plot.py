@@ -2,15 +2,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Initialising random points for the users
-x = np.arange(5)
-y = np.random.randint(15, size=5)
+x = np.arange(0,5)
+y = np.random.randint(0,15, size=5)
+
 
 ax = plt.subplot()
 # Plot labels and plot type
 # plt.scatter(x, y, color='b', marker='^')
 ax.scatter(x, y, color='b')
-plt.xlabel("x")
-plt.ylabel("y")
+# plt.xlabel("x")
+# plt.ylabel("y")
 
 # User Coordinates
 coordinates = []
@@ -24,6 +25,7 @@ for items in coordinates:
 
 file.close()
 
+# Circumference Test
 for a, b in coordinates:
     cir = plt.Circle((a,b), 1.5, color='r', fill=False)
     ax.set_aspect('equal', adjustable='datalim')
@@ -35,6 +37,6 @@ for a, b in coordinates:
 fig1 = plt.gcf()
 plt.savefig('Users.png')
 plt.show()
-plt.draw()
+# plt.draw()
 # Saving the plot
 

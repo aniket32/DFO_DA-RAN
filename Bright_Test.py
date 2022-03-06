@@ -16,9 +16,9 @@ def f(x):  # x IS A VECTOR REPRESENTING ONE FLY
 N = 20  # POPULATION SIZE
 D = 2  # DIMENSIONALITY
 delta = 0.001  # DISTURBANCE THRESHOLD
-maxIterations = 50  # ITERATIONS ALLOWED
+maxIterations = 200  # ITERATIONS ALLOWED
 
-imgW = len(img[0])
+imgW = len(img)
 imgH = len(img)
 
 lowerB = [0] * D  # LOWER BOUND (IN ALL DIMENSIONS)
@@ -69,6 +69,7 @@ for itr in range(maxIterations):
 
     rowNo = X[s, 1]
     colNo = X[s, 0]
+    print(rowNo, colNo)
     swarmBestCircle = plt.Circle((rowNo, colNo), 5, color='r')
 
     circle = []  # THIS SECTION IS OPTIONAL TO SHOW ALL FLIES
