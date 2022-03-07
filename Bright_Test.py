@@ -69,7 +69,7 @@ for itr in range(maxIterations):
 
     rowNo = X[s, 1]
     colNo = X[s, 0]
-    print(rowNo, colNo)
+    # print(rowNo, colNo)
     swarmBestCircle = plt.Circle((rowNo, colNo), 5, color='r')
 
     circle = []  # THIS SECTION IS OPTIONAL TO SHOW ALL FLIES

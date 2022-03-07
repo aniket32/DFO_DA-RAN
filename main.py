@@ -3,16 +3,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Randomizing the x and y coordinates
-x = np.random.randint(0, 89, size=20)
-y = np.random.randint(0, 89, size=20)
+x = np.random.randint(0, 2000, size=10)
+y = np.random.randint(0, 2000, size=10)
 
 ax = plt.subplot()
 
 # Plot labels and plot type
-ax.scatter(x, y, color='b', marker='^')
 plt.xlabel("x")
 plt.ylabel("y")
-
 
 # User Coordinates
 coordinates = []
@@ -24,10 +22,7 @@ file = open('coordinates.txt', 'w')
 for items in coordinates:
     line = ' '.join(str(x) for x in items)
     file.write(line + '\n')
-
 file.close()
-
-
 
 # Parameters
 thita_opt = 0.35499997
@@ -49,21 +44,36 @@ imgH = 5
 # FITNESS FUNCTION
 # PL_th(Pathloss Threshold) is the x
 def f(x):  # x IS A VECTOR REPRESENTING ONE FLY
+    best = []
+    yes =0
+    no =0
     R = 0.0
     for i in range(len(x)):
         R = (-(20 * A_1) / (1 + a * math.exp(-b * (((180 / math.pi) * thita_opt) - a))) - (B_1 / 20) + (
                 x[0] / 20)) * math.cos(thita_opt)
-    return R
+
+    for items in coordinates:
+        x_i = items[0]
+        y_i = items[1]
+        for i in range(N):
+            x_d = X[i, 0]
+            y_d = X[i, 1]
+            coverage = ((x_i-x_d)**2 +(y_i-y_d)**2)
+            if coverage <= R**2:
+                yes +=1
+            print(yes,R)
+
+    return yes
 
 
-N = 10 # POPULATION SIZE
-D = 2  # DIMENSIONALITY
+N = 1 # POPULATION SIZE
+D = 3  # DIMENSIONALITY
 delta = 0.001  # DISTURBANCE THRESHOLD
-maxIterations = 500  # ITERATIONS ALLOWED
+maxIterations = 200  # ITERATIONS ALLOWED
 
 # DC_Pathloss
-lowerB = [0, 0]  # LOWER BOUND (IN ALL DIMENSIONS)
-upperB = [89, 89]  # UPPER BOUND (IN ALL DIMENSIONS)
+lowerB = [0, 0, 0]  # LOWER BOUND (IN ALL DIMENSIONS)
+upperB = [89, 2000, 2000]  # UPPER BOUND (IN ALL DIMENSIONS)
 
 # INITIALISATION PHASE
 X = np.empty([N, D])  # EMPTY FLIES ARRAY OF SIZE: (N,D)
@@ -73,11 +83,17 @@ fitness = [None] * N  # EMPTY FITNESS ARRAY OF SIZE N
 for i in range(N):
     for d in range(D):
         X[i, d] = np.random.uniform(lowerB[d], upperB[d])
+        # print(X[i,d],"Xid")
 
 # MAIN DFO LOOP
 for itr in range(maxIterations):
+    ax.scatter(x, y, color='b', marker='^')
+    plt.draw()
+    plt.show(block=False)
+
     for i in range(N):  # EVALUATION
-        fitness[i] = f(X[i,])
+        fitness[i] = f(X[i])
+        # print(fitness[i],"X1")
     s = np.argmax(fitness)  # FIND BEST FLY
 
     if itr % 100 == 0:  # PRINT BEST FLY EVERY 100 ITERATIONS
@@ -99,17 +115,17 @@ for itr in range(maxIterations):
                 continue;
 
             u = np.random.rand()
-            X[i, d] = X[bNeighbour, d] + u * (X[s, d] - X[i, d])
+            X[i, d] = X[bNeighbour, d] + u * (X[bNeighbour, d] - X[i, d])
 
             # OUT OF BOUND CONTROL
             if X[i, d] < lowerB[d] or X[i, d] > upperB[d]:
                 X[i, d] = np.random.uniform(lowerB[d], upperB[d])
 
     rowNo = X[s, 1]
-    colNo = X[s, 0]
-    swarmBestCircle = plt.Circle((rowNo, colNo), 1, color='r')
-    # Coverage Range of the Drones
-    cir = plt.Circle((rowNo, colNo), 10, color='b', fill=False)
+    colNo = X[s, 2]
+    swarmBestCircle = plt.Circle((rowNo, colNo), 10, color='r')
+    # Coverage Range of the Drones on the Plot
+    cir = plt.Circle((rowNo, colNo), 400, color='y', fill=False)
     ax.set_aspect('equal', adjustable='datalim')
     ax.add_patch(cir)
 
@@ -118,20 +134,19 @@ for itr in range(maxIterations):
 
     circle = []  # THIS SECTION IS OPTIONAL TO SHOW ALL FLIES
     for i in range(N):
-        circle.append(plt.Circle((X[i, 1], X[i, 0]), 1, color='g'))
+        circle.append(plt.Circle((X[i, 2], X[i, 1]), 10, color='g'))
         plt.gca().add_patch(circle[i])
-        # Coverage Radius of the Drones
-        cir = plt.Circle((X[i,1], X[i,0]), 10, color='b', fill=False)
+        # Coverage Radius of the Drones on the Plot
+        cir = plt.Circle((X[i,2], X[i,1]), 400, color='y', fill=False)
         ax.set_aspect('equal', adjustable='datalim')
         ax.add_patch(cir)
 
     plt.gca().add_patch(swarmBestCircle)  # ADD THE CIRCLE
-    plt.show(block = False)
+    plt.show(block=False)
     plt.draw()  # DRAW THE IMAGE AND THE CIRCLE # REMOVE THE AXES
-    plt.pause(0.01) # PAUSE BEFORE THE NEXT ITERATION IN BETWEEN
+    plt.pause(0.01)  # PAUSE BEFORE THE NEXT ITERATION IN BETWEEN
     # plt.clf()  # CLEAR THE CANVAS
-    # ax.grid(True)
-
+    ax.grid(True)
 
 for i in range(N): fitness[i] = f(X[i,])  # EVALUATION
 s = np.argmax(fitness)
@@ -141,4 +156,3 @@ print("\nFinal best fitness:\t", fitness[s])
 print("\nBest fly position:\n", X[s,])
 print("\nTotal circumference:\n", 2 * math.pi * fitness[s])
 print("\nHeight:\n", fitness[s] * math.tan(thita_opt))
-
