@@ -3,7 +3,7 @@ import matplotlib.image as mpimg
 import random
 import numpy as np
 
-img = mpimg.imread('input3.png')
+img = mpimg.imread('input5.png')
 
 
 # FITNESS FUNCTION
@@ -16,7 +16,7 @@ def f(x):  # x IS A VECTOR REPRESENTING ONE FLY
 N = 20  # POPULATION SIZE
 D = 2  # DIMENSIONALITY
 delta = 0.001  # DISTURBANCE THRESHOLD
-maxIterations = 200  # ITERATIONS ALLOWED
+maxIterations = 500  # ITERATIONS ALLOWED
 
 imgW = len(img)
 imgH = len(img)
@@ -57,7 +57,7 @@ for itr in range(maxIterations):
         for d in range(D):  # UPDATE EACH DIMENSION SEPARATELY
             if np.random.rand() < delta:
                 X[i, d] = np.random.uniform(lowerB[d], upperB[d])
-                continue;
+                continue
 
             u = np.random.rand()
             X[i, d] = X[bNeighbour, d] + u * (X[bNeighbour, d] - X[i, d])
