@@ -1,45 +1,43 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import mpl_toolkits.mplot3d.art3d as art3d
+import csv
 
-# Initialising random points for the users
-x = np.random.randint(0, 40, size=10)
-y = np.random.randint(0, 40, size=10)
-z = np.random.randint(0, 40, size=10)
+# coordinates=[]
+# for i,j,k in zip(x,y,z):
+#     coordinates.append((i,j,k))
+#
+# Writing to a csv
+# with open('.csv', 'w', newline='') as file:
+#     mywriter = csv.writer(file, delimiter=',')
+#     mywriter.writerows(coordinates)
 
-ax = plt.subplot(projection='3d')
-# Plot labels and plot type
-# plt.scatter(x, y, color='b', marker='^')
-ax.scatter(x, y, z, color='b')
-# plt.xlabel("x")
-# plt.ylabel("y")
 
-# User Coordinates
-coordinates = []
-for i, j, k in zip(x, y, z):
-    coordinates.append((i, j, k))
-print(coordinates)
-
-# with open("coordinates.csv", "w", newline=' ') as f:
-#     wr = csv.writer(f, delimiter = ",")
-#     wr.writerows(coordinates)
-
-# file = open('coordinates.txt', 'w')
-# for items in coordinates:
-#     line = ' '.join(str(x) for x in items)
-#     file.write(line + '\n')
-# file.close()
+# Reading from a csv to an ARRAY
+file = np.genfromtxt('coordinates.csv', delimiter=',')
+f = open('coordinates.csv')
+reader = csv.reader(f)
+lines = len(list(reader))
+for i, j in file:
+    x_coor = i
+    y_coor = j
+    for i in range(lines):
+        z_coor = 0
+        ax = plt.subplot(projection='3d')
+        ax.scatter(x_coor, y_coor, z_coor, color='b', marker='^')
 
 # Circumference Test
-for a, b, c in coordinates:
-    cir = plt.Circle((a, b), 1.5, color='r', fill=False)
-    # ax.set_aspect('equal', adjustable='datalim')
-    ax.add_patch(cir)
-    art3d.pathpatch_2d_to_3d(cir, z = c, zdir="z")
+# for a, b, c in coordinates:
+#     cir = plt.Circle((a, b), 1.5, color='r', fill=False)
+#     # ax.set_aspect('equal', adjustable='datalim')
+#     ax.add_patch(cir)
+#     art3d.pathpatch_2d_to_3d(cir, z=c, zdir="z")
 
 # Show Plot
 # plt.grid(True)
-fig1 = plt.gcf()
-plt.show()
+# fig1 = plt.gcf()
+# plt.xlim([0, 3000])  # LIMITING THE PLOT FROM 0 TO 3000 IN X ASIS
+# plt.ylim([0, 3000])
+# plt.show()
 # plt.draw()
 # Saving the plot

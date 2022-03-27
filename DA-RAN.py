@@ -1,22 +1,12 @@
-# IMPORTING THE MODULES
+# IMPORTING THE LIBRARIES
+import csv
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-import mpl_toolkits.mplot3d.art3d as art3d
 
 # RANDOM INITIALIZATIONS OF THE USER COORDINATES
 x_coor = np.random.randint(0, 3000, size=20)
 y_coor = np.random.randint(0, 3000, size=20)
-
-coordinates = []  # ARRAY TO STORE THE USER COORDINATES
-for i, j in zip(x_coor, y_coor):
-    coordinates.append((i, j))
-
-file = open('coordinates.txt', 'w')
-for items in coordinates:
-    line = ' '.join(str(x) for x in items)
-    file.write(line + '\n')
-file.close()
 
 # EXPERIMENTAL PARAMETERS BASED ON THE SUB-URBAN ENVIRONMENT
 thita_opt = 0.35499997  # OPTIMAL ELEVATION ANGLE
@@ -27,20 +17,26 @@ B = 4.14  # CONSTANT VALUE
 P_LoS = 0.0001  # PROBABILITY OF LINE OF SIGHT
 P_NLoS = 21  # PROBABILITY OF NON LINE OF SIGHT
 f_c = 2.4  # CARRIER FREQUENCY
-c = 3000  # SPEED OF LIGHT
+c = 600  # SPEED OF LIGHT
 A_1 = P_LoS - P_NLoS
 B_1 = 20 * math.log10((4 * math.pi * f_c) / c) + P_LoS
+covud = []
 
+coordinates = []  # ARRAY TO STORE THE USER COORDINATES
+for i, j in zip(x_coor, y_coor):
+    coordinates.append((i, j))
 
-# R = 395  # COVERAGE RADIUS
+with open('coordinates.csv', 'w', newline='') as file:
+    mywriter = csv.writer(file, delimiter=',')
+    mywriter.writerows(coordinates)
+
 
 # FITNESS FUNCTION
 def f(x):  # x IS THE COORDINATED OF ONE FLY
     yes = 0
     for items in coordinates:
-        # USER COORDINATE
-        x_i = items[0]
-        y_i = items[1]
+        x_i = items[0]  # USER X COORDINATE
+        y_i = items[1]  # USER Y COORDINATE
         for i in range(N):
             x_d = x[1]  # FLY/DRONE X COORDINATE
             y_d = x[0]  # FLY/DRONE Y COORDINATE
@@ -63,12 +59,12 @@ def rad(x):  # X IS THE PATHLOSS OF ONE FLY
     return r
 
 
-N = 10  # POPULATION SIZE
+N = 7  # POPULATION SIZE
 D = 3  # DIMENSIONALITY
 delta = 0.01  # DISTURBANCE THRESHOLD
-maxIterations = 1200  # ITERATIONS ALLOWED
+maxIterations = 600  # ITERATIONS ALLOWED
 lowerB = [0, 0, 0]  # LOWER BOUND (IN ALL DIMENSIONS)
-upperB = [3000, 3000, 89]  # UPPER BOUND (IN ALL DIMENSIONS)
+upperB = [3000, 3000, 80]  # UPPER BOUND (IN ALL DIMENSIONS)
 
 # INITIALISATION PHASE
 X = np.empty([N, D])  # EMPTY FLIES ARRAY OF SIZE: (N,D)
@@ -85,16 +81,21 @@ for i in range(N):
 for i in range(N):
     radius[i] = rad(X[i,])
 
-# HEIGHT OF EACH FLY/DRONE IN ACCORDANCE WITH CIVERAGE RADIUS
+# HEIGHT OF EACH FLY/DRONE IN ACCORDANCE WITH COVERAGE RADIUS
 for y in radius:
     h = y * math.tan(thita_opt)
     height.append(h)
-print(height, "height")
+
+for i in range(N):  # EVALUATION
+    fitness[i] = f(X[i,])
 
 # MAIN DFO LOOP
 for itr in range(maxIterations):
     ax = plt.subplot()
-    ax.scatter(x_coor, y_coor, color='b', marker='^')
+    for i, j in coordinates:
+        x = i
+        y = j
+        ax.scatter(x, y, color='b', marker='^')
     plt.draw()
     plt.show(block=False)
 
@@ -104,7 +105,29 @@ for itr in range(maxIterations):
 
     if itr % 300 == 0:  # PRINT BEST FLY EVERY 300 ITERATIONS
         print("Iteration:", itr, "\tBest fly index:", s,
-              "\tFitness value:", fitness[s])
+              "\tFitness value:", (fitness[s]) / N)
+        x_d = X[s, 0]  # DRONE/FLY X COORDINATE
+        y_d = X[s, 1]  # DRONE/FLU Y COORDINATE
+        for it in coordinates:
+            x_i = it[0]  # USER X COORDINATE
+            y_i = it[1]  # USER Y COORDINATE
+            coverage = ((x_i - x_d) ** 2 + (y_i - y_d) ** 2)
+            if coverage <= radius[s] * radius[s]:
+                # IF USER WITHIN THE DRONE COVERAGE RADIUS APPEND THE DRONE AND THE COVERED USERS
+                covud.append(((x_d, y_d, height[s]), (x_i, y_i)))
+                # REMOVE THE COVERED USERS FROM THE USER COORDINATES ARRAY
+                coordinates.remove((x_i, y_i))
+        d = {}
+        for x in covud:
+            # STORING THE COORDINATED IN A DICTIONARY WHERE THE BEST DRONE IS THE KEY
+            # AND THE COVERED USERS IS THE VALUES
+            d.setdefault(x[0], []).append(x[1])
+
+        with open('coverage.txt', 'w') as fw:
+            fw.write(str(d))
+
+        for key, value in d.items():
+            print(key, "test")
 
     # TAKE EACH FLY INDIVIDUALLY
     for i in range(N):
@@ -136,9 +159,6 @@ for itr in range(maxIterations):
     ax.set_aspect('equal', adjustable='datalim')
     ax.add_patch(cir)
 
-    # for a, b in zip(rowNo,colNo):
-    #     print(a,b)
-
     # PLOTTING ALL THE FLY
     circle = []
     for i in range(N):
@@ -157,27 +177,8 @@ for itr in range(maxIterations):
     plt.pause(0.01)
     plt.clf()  # CLEARING THE CANVAS
 
-    # drone_coor = []
-    # new_coor = []
-    # if itr == 300:
-    #     for i in range(N):
-    #         fitness[i] = f(X[i,])  # EVALUATION
-    #         s = np.argmax(fitness)
-    #         x_d = X[s, 0]
-    #         y_d = X[s, 1]
-    #         for items in coordinates:
-    #             x_i = items[0]
-    #             y_i = items[1]
-    #             coverage = ((x_i - y_d) ** 2 + (y_i - x_d) ** 2)
-    #             if coverage <= R * R:
-    #                 drone_coor.append((x_d, y_d))
-    #                 new_coor.append((x_i, y_i))
-    #
-    #     print(drone_coor, "drone")
-    #     print(new_coor, "users")
-
-for i in range(N): fitness[i] = f(X[i,])  # EVALUATION
-s = np.argmax(fitness)  # FIND BEST FLY
-
-print("\nFinal best fitness:\t", fitness[s])
-print("\nBest fly position:\n", X[s,])
+# for i in range(N): fitness[i] = f(X[i,])  # EVALUATION
+# s = np.argmax(fitness)  # FIND BEST FLY
+#
+# print("\nFinal best fitness:\t", fitness[s])
+# print("\nBest fly position:\n", X[s,])
