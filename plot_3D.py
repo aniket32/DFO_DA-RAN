@@ -8,16 +8,26 @@ import mpl_toolkits.mplot3d.art3d as art3d
 ax = plt.subplot(projection='3d')
 
 # READING FROM CSV TO AN ARRAY
-coordinates = np.genfromtxt('coordinates.csv', delimiter=',')
+coordinates = np.genfromtxt('cov_users.csv', delimiter=',')
+uncov_users = np.genfromtxt('ucov_users.csv', delimiter=',')
 f = open('coordinates.csv')
 reader = csv.reader(f)
 lines = len(list(reader))
+# PLOTTING COVERED USERS
 for i, j in coordinates:
     x_coor = i # USER X COORDINATE
     y_coor = j # USER Y COORDINATE
     for i in range(lines):
         z_coor = 0
         ax.scatter(x_coor, y_coor, z_coor, color='b', marker='^')
+
+# PLOTTING UNCOVERED USERS
+for i, j in uncov_users:
+    ux_coor = i  # USER X COORDINATE
+    uy_coor = j  # USER Y COORDINATE
+    for i in range(lines):
+        uz_coor = 0
+        ax.scatter(ux_coor, uy_coor,uz_coor, color='r', marker='^')
 
 # READING FROM CSV TO AN ARRAY
 best_drone = np.genfromtxt('best_drones.csv', delimiter=',')
@@ -36,6 +46,7 @@ for i,j,k,l in best_drone:
 # SHOW PLOT
 plt.xlim([0, 3000])  # LIMITING THE PLOT FROM 0 TO 3000 IN X ASIS
 plt.ylim([0, 3000])  # LIMITING THE PLOT FROM 0 TO 3000 IN Y AXIS
+plt.legend()
 plt.show()
 plt.draw()
 

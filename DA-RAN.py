@@ -21,6 +21,7 @@ c = 600  # SPEED OF LIGHT
 A_1 = P_LoS - P_NLoS
 B_1 = 20 * math.log10((4 * math.pi * f_c) / c) + P_LoS
 covud = []
+cov = []
 
 coordinates = []  # ARRAY TO STORE THE USER COORDINATES
 for i, j in zip(x_coor, y_coor):
@@ -62,7 +63,7 @@ def rad(x):  # X IS THE PATHLOSS OF ONE FLY
 N = 7  # POPULATION SIZE
 D = 3  # DIMENSIONALITY
 delta = 0.01  # DISTURBANCE THRESHOLD
-maxIterations = 600  # ITERATIONS ALLOWED
+maxIterations = 500  # ITERATIONS ALLOWED
 lowerB = [0, 0, 0]  # LOWER BOUND (IN ALL DIMENSIONS)
 upperB = [3000, 3000, 80]  # UPPER BOUND (IN ALL DIMENSIONS)
 
@@ -104,7 +105,7 @@ for itr in range(maxIterations):
         fitness[i] = f(X[i,])
     s = np.argmax(fitness)  # FIND BEST FLY
 
-    if itr % 300 == 0:  # PRINT BEST FLY EVERY 300 ITERATIONS
+    if itr % 50 == 0:  # PRINT BEST FLY EVERY 300 ITERATIONS
         print("Iteration:", itr, "\tBest fly index:", s)
         x_d = X[s, 0]  # DRONE/FLY X COORDINATE
         y_d = X[s, 1]  # DRONE/FLU Y COORDINATE
@@ -115,8 +116,14 @@ for itr in range(maxIterations):
             if coverage <= radius[s] * radius[s]:
                 # IF USER WITHIN THE DRONE COVERAGE RADIUS APPEND THE DRONE AND THE COVERED USERS
                 covud.append(((x_d, y_d, height[s], radius[s]), (x_i, y_i)))
+                # STORING THE COVERED USERS IN AN ARRAY FOR LATER USE
+                cov.append((x_i,y_i))
                 # REMOVE THE COVERED USERS FROM THE USER COORDINATES ARRAY
                 coordinates.remove((x_i, y_i))
+
+        # with open('cov_users.csv', 'w', newline='') as f:
+        #     mw = csv.writer(f, delimiter=',')
+        #     mw.writerows(cov)
         d = {}
         for x in covud:
             # STORING THE COORDINATED IN A DICTIONARY WHERE THE BEST DRONE IS THE KEY
@@ -127,7 +134,11 @@ for itr in range(maxIterations):
             fw.write(str(d))
 
         # for key, value in d.items():
-        #     print(key, "test")
+        #     # for i in value:
+        #     print(value,"test")
+        with open('cov_users.csv', 'w', newline='') as file:
+            mywriter = csv.writer(file, delimiter=',')
+            mywriter.writerows(cov)
 
         # SAVING THE BEST DRONE COORDINATES, HEIGHT AND RADIUS TO A CSV FILE
         with open('best_drones.csv', 'w', newline='') as file:
@@ -181,3 +192,16 @@ for itr in range(maxIterations):
     plt.show(block=False)
     plt.pause(0.01)
     plt.clf()  # CLEARING THE CANVAS
+
+# FINDING THE UNCOVERED USERS
+f1 = open('coordinates.csv', 'r', newline='')
+f2 = open('cov_users.csv', 'r', newline='')
+f3 = open('ucov_users.csv', 'w', newline='')
+c1 = csv.reader(f1)
+c2 = csv.reader(f2)
+c3 = csv.writer(f3)
+masterlist = [row[0] for row in c2]
+
+for hosts_row in c1:
+    if hosts_row[0] not in masterlist:
+        c3.writerow(hosts_row)
