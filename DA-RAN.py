@@ -92,6 +92,7 @@ for i in range(N):  # EVALUATION
 # MAIN DFO LOOP
 for itr in range(maxIterations):
     ax = plt.subplot()
+    # USER COORDINATES FOR PLOTTING
     for i, j in coordinates:
         x = i
         y = j
@@ -104,8 +105,7 @@ for itr in range(maxIterations):
     s = np.argmax(fitness)  # FIND BEST FLY
 
     if itr % 300 == 0:  # PRINT BEST FLY EVERY 300 ITERATIONS
-        print("Iteration:", itr, "\tBest fly index:", s,
-              "\tFitness value:", (fitness[s]) / N)
+        print("Iteration:", itr, "\tBest fly index:", s)
         x_d = X[s, 0]  # DRONE/FLY X COORDINATE
         y_d = X[s, 1]  # DRONE/FLU Y COORDINATE
         for it in coordinates:
@@ -114,7 +114,7 @@ for itr in range(maxIterations):
             coverage = ((x_i - x_d) ** 2 + (y_i - y_d) ** 2)
             if coverage <= radius[s] * radius[s]:
                 # IF USER WITHIN THE DRONE COVERAGE RADIUS APPEND THE DRONE AND THE COVERED USERS
-                covud.append(((x_d, y_d, height[s]), (x_i, y_i)))
+                covud.append(((x_d, y_d, height[s], radius[s]), (x_i, y_i)))
                 # REMOVE THE COVERED USERS FROM THE USER COORDINATES ARRAY
                 coordinates.remove((x_i, y_i))
         d = {}
@@ -122,12 +122,17 @@ for itr in range(maxIterations):
             # STORING THE COORDINATED IN A DICTIONARY WHERE THE BEST DRONE IS THE KEY
             # AND THE COVERED USERS IS THE VALUES
             d.setdefault(x[0], []).append(x[1])
-
+        # SAVING THE COVERED USERS AND TEH ASSOCIATED DRONE IN A TEXT FILE
         with open('coverage.txt', 'w') as fw:
             fw.write(str(d))
 
-        for key, value in d.items():
-            print(key, "test")
+        # for key, value in d.items():
+        #     print(key, "test")
+
+        # SAVING THE BEST DRONE COORDINATES, HEIGHT AND RADIUS TO A CSV FILE
+        with open('best_drones.csv', 'w', newline='') as file:
+            mywriter = csv.writer(file, delimiter=',')
+            mywriter.writerows(d)
 
     # TAKE EACH FLY INDIVIDUALLY
     for i in range(N):
@@ -176,9 +181,3 @@ for itr in range(maxIterations):
     plt.show(block=False)
     plt.pause(0.01)
     plt.clf()  # CLEARING THE CANVAS
-
-# for i in range(N): fitness[i] = f(X[i,])  # EVALUATION
-# s = np.argmax(fitness)  # FIND BEST FLY
-#
-# print("\nFinal best fitness:\t", fitness[s])
-# print("\nBest fly position:\n", X[s,])
