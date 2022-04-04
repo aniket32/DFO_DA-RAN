@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 path = 'ucov_users.csv'
 
+
 # PLOTTING THE GRAPH IN 2D
 ax = plt.subplot()
 
@@ -16,11 +17,11 @@ for i, j in coordinates:
     y_coor = j  # USER Y COORDINATE
     plt.scatter(x_coor, y_coor, color='b', marker='^')
 # PLOTTING UNCOVERED USERS
-if os.stat(path).st_size ==0:
+if os.stat(path).st_size == 0:
     print("All users are covered")
 else:
     uncov_users = np.genfromtxt('ucov_users.csv', delimiter=',')
-    for i, j in uncov_users:
+    for i,j in uncov_users:
         ux_coor = i  # USER X COORDINATE
         uy_coor = j  # USER Y COORDINATE
         plt.scatter(ux_coor, uy_coor, color='r', marker=',')
@@ -40,5 +41,6 @@ for i, j, k, l in best_drone:
 # SHOW PLOT
 plt.xlim([0, 3000])  # LIMITING THE PLOT FROM 0 TO 3000 IN X ASIS
 plt.ylim([0, 3000])  # LIMITING THE PLOT FROM 0 TO 3000 IN Y AXIS
+plt.grid(True)
 plt.show()
 plt.draw()
