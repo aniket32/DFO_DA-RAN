@@ -1,8 +1,10 @@
 # IMPORTING THE LIBRARIES
 import os
+import csv
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+import mpl_toolkits.mplot3d.art3d as art3d
 
 path = 'ucov_users.csv'
 
@@ -30,56 +32,68 @@ h = r * math.tan(thita_opt)  # HEIGHT OF THE DRONES
 x_limit = 5000
 y_limit = 5000
 
-# BASE STATION COORDINATES TO BE IN THE CENTRE OF THE PLOT
 bs_xcoor = x_limit / 2
 bs_ycoor = y_limit / 2
 
-# PLOTTING THE GRAPH IN 2D
-ax = plt.subplot()
+
+# PLOTTING THE GRAPH IN 3D
+ax = plt.subplot(projection='3d')
+
+# PLOTTING THE BASE STATION
+ax.scatter(bs_xcoor, bs_ycoor, 200, color='r', marker='^')
+# PLOTTING THE BASE STATION COVERAGE RANGE
+cir = plt.Circle((bs_xcoor, bs_ycoor), 2500, color='y', fill=False)
+ax.add_patch(cir)
+# ax.set_aspect('equal', adjustable='datalim')
+# PLOTTING THE OPERATIONAL RANGE OF DRONES
+c = plt.Circle((bs_xcoor, bs_ycoor), max_R_DB, color='r', fill=False)
+ax.add_patch(c)
+# ax.set_aspect('equal', adjustable='datalim')
+art3d.pathpatch_2d_to_3d(cir, z=200, zdir="z")
+art3d.pathpatch_2d_to_3d(c, z=200, zdir="z")
 
 
 # READING FROM CSV TO AN ARRAY
 coordinates = np.genfromtxt('cov_users.csv', delimiter=',')
-plt.scatter(bs_xcoor, bs_ycoor, color='r', marker='^')
-# PLOTTING THE BASE STATION COVERAGE RANGE
-cir = plt.Circle((bs_xcoor, bs_ycoor), 2500, color='y', fill=False)
-ax.set_aspect('equal', adjustable='datalim')
-# PLOTTING THE OPERATIONAL RANGE OF DRONES
-c = plt.Circle((bs_xcoor, bs_ycoor), max_R_DB, color='r', fill=False)
-ax.set_aspect('equal', adjustable='datalim')
-ax.add_patch(cir)
-ax.add_patch(c)
-
-
+f = open('coordinates.csv')
+reader = csv.reader(f)
+lines = len(list(reader))
+# PLOTTING COVERED USERS
 for i, j in coordinates:
-    x_coor = i  # USER X COORDINATE
-    y_coor = j  # USER Y COORDINATE
-    plt.scatter(x_coor, y_coor, color='b', marker=',')
+    x_coor = i # USER X COORDINATE
+    y_coor = j # USER Y COORDINATE
+    for i in range(lines):
+        z_coor = 0
+        ax.scatter(x_coor, y_coor, z_coor, color='b', marker=',')
 
-# CHECKING IF ALL USERS ARE COVERED OR NOT
-if os.stat(path).st_size == 0:
+# PLOTTING UNCOVERED USERS
+if os.stat(path).st_size ==0:
     print("All users are covered")
 else:
     uncov_users = np.genfromtxt('ucov_users.csv', delimiter=',')
-    for k, l in uncov_users:
-        # PLOTTING THE UNCOVERED USERS
-        plt.scatter(k, l, color='r', marker=',')
-
+    for i, j in uncov_users:
+        ux_coor = i  # USER X COORDINATE
+        uy_coor = j  # USER Y COORDINATE
+        for i in range(lines):
+            uz_coor = 0
+            ax.scatter(ux_coor, uy_coor,uz_coor, color='r', marker=',')
 
 # READING FROM CSV TO AN ARRAY
 best_drone = np.genfromtxt('best_drones.csv', delimiter=',')
-for m, n, O in best_drone:
-    x_d = m  # DRONE X COORDINATE
-    y_d = n  # DRONE Y COORDINATE# DRONE COVERAGE RADIUS
-    ax.scatter(x_d, y_d, color='r')
+for m,n,o in best_drone:
+    x_d = m # DRONE X COORDINATE
+    y_d = n # DRONE Y COORDINATE
+    z_d = o # DROVE Z COORDINATE  # DRONE COVERAGE RADIUS
+    ax.scatter(x_d, y_d, z_d, color='r')
     # COVERAGE RADIUS OF THE DRONES/FLY
     cir = plt.Circle((x_d, y_d), r, color='y', fill=False)
-    ax.set_aspect('equal', adjustable='datalim')
     ax.add_patch(cir)
+    # PLOTTING THE COVERAGE IN ACCORDANCE WITH Z AXIS
+    art3d.pathpatch_2d_to_3d(cir, z=z_d, zdir="z")
 
 # SHOW PLOT
 plt.xlim([0, 5000])  # LIMITING THE PLOT FROM 0 TO 3000 IN X ASIS
 plt.ylim([0, 5000])  # LIMITING THE PLOT FROM 0 TO 3000 IN Y AXIS
-plt.grid(True)
 plt.show()
 plt.draw()
+

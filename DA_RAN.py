@@ -5,8 +5,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # RANDOM INITIALIZATIONS OF THE USER COORDINATES
-x_coor = np.random.randint(1000, 4000, size=20)
-y_coor = np.random.randint(1000, 4000, size=20)
+x_coor = np.random.randint(900, 4100, size=20)
+y_coor = np.random.randint(900, 4100, size=20)
 
 # LIMITS FOR THE PLOT
 x_limit = 5000
@@ -49,13 +49,13 @@ h = r * math.tan(thita_opt)  # HEIGHT OF THE DRONES
 # chain drone (cloud)
 
 
-N = 20  # POPULATION SIZE
+N = 30  # POPULATION SIZE
 D = 2  # DIMENSIONALITY
 delta = 0.001  # DISTURBANCE THRESHOLD
-maxIterations = 2600  # ITERATIONS ALLOWED
+maxIterations = 4000  # ITERATIONS ALLOWED
 
-lowerB = [1000, 1000]  # LOWER BOUND (IN ALL DIMENSIONS)
-upperB = [4000, 4000]  # UPPER BOUND (IN ALL DIMENSIONS)
+lowerB = [0, 0]  # LOWER BOUND (IN ALL DIMENSIONS)
+upperB = [5000, 5000]  # UPPER BOUND (IN ALL DIMENSIONS)
 
 # INITIALISATION PHASE
 X = np.empty([N, D])  # EMPTY FLIES ARRAY OF SIZE: (N,D)
@@ -161,7 +161,7 @@ for itr in range(1, maxIterations):
         # THE DRONE/FLY WITH THE MAXIMUM NUMBER OF USERS IS THE BEST FLY
     s = np.argmax(fitness)
 
-    if itr % 150 == 0:
+    if itr % 400 == 0:
         # AFTER EVERY 150 ITERATIONS
         print("Iteration:", itr, "\tUsers covered:", fitness[s])
         # STORING THE CURRENT BEST FLY X AND Y COORDINATES
@@ -177,8 +177,21 @@ for itr in range(1, maxIterations):
 
         if range_test(r_dd) >= 1:
             for i in range(N):
+                for it in coordinates:
+                    x_i = it[0]  # USER X COORDINATE
+                    y_i = it[1]  # USER Y COORDINATE
+                    x_d = X[s, 0]  # DRONE/FLY X COORDINATE
+                    y_d = X[s, 1]  # DRONE/FLU Y COORDINATE
+                    # DRONE COVERAGE
+                    coverage = ((x_i - x_d) ** 2 + (y_i - y_d) ** 2)
+                    # DRONE TO BASE STATION DISTANCE
+                    r_db = math.sqrt((bs_xcoor - x_d) ** 2 + (bs_ycoor - y_d) ** 2)
+                    if coverage <= r * r and r_db <= 1280:
+                        # REMOVING THE COVERED FROM THE SEARCH SPACE
+                        coordinates.remove((x_i, y_i))
                 for d in range(D):  # UPDATE EACH DIMENSION SEPARATELY
                     X[i, d] = np.random.uniform(lowerB[d], upperB[d])
+            print("Users Removed")
         elif range_test(r_dd) == 0:
             for i in range(N):
                 for it in coordinates:
@@ -197,6 +210,7 @@ for itr in range(1, maxIterations):
                         cov.append((x_i, y_i))
                         # REMOVING THE COVERED FROM THE SEARCH SPACE
                         coordinates.remove((x_i, y_i))
+            print("Users Stored and removed")
     # CLEARING THE ARRAY FOR NEXT ITERATION
     r_dd.clear()
 
@@ -254,10 +268,6 @@ for itr in range(1, maxIterations):
     for i in range(N):
         circle.append(plt.Circle((X[i, 0], X[i, 1]), 10, color='g'))
         plt.gca().add_patch(circle[i])
-        # PLOTTING THE COVERAGE OF ALL DRONES
-        cir = plt.Circle((x_d, y_d), r, color='y', fill=False)
-        ax.set_aspect('equal', adjustable='datalim')
-        ax.add_patch(cir)
 
     plt.gca().add_patch(swarmBestCircle)  # ADD THE CIRCLE
     plt.draw()  # PLOTTING THE PLOT AND THE CIRCLES
