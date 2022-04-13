@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 # RANDOM INITIALIZATIONS OF THE USER COORDINATES
 size = 20
-x_coor = np.random.randint(1000, 4000, size=size)
+x_coor = np.random.randint(1000, 400, size=size)
 y_coor = np.random.randint(1000, 4000, size=size)
 
 # LIMITS FOR THE PLOT
@@ -29,7 +29,6 @@ alpha = 3.04  # CONSTANT VALUE
 nLoS = 0.1  # MEAN ADDITIONAL LOSS FOR LINE OF SIGHT
 nNLoS = 21  # MEAN ADDITIONAL LOS FOR NON LINE OF SIGHT
 n_zero = 20.7  # CONSTANT VALUE
-thita = 0
 thita_zero = -3.61  # CONSTANT VALUE
 thita_opt = 0.35499997  # OPTIMAL ELEVATION ANGLE
 PL_D2U_max = 89  # UPPERBOUND FOR USER TO DRONE PATHLOSS
@@ -39,7 +38,7 @@ PL_D2B_min = 0  # UPPERBOUND FOR DRONE TO BASE STATION PATHLOSS
 A_1 = nLoS - nNLoS  # PARAMETER FOR COVERAGE RADIUS
 B_1 = 20 * math.log10((4 * math.pi * f_c) / c) + nLoS  # PARAMETER FOR COVERAGE RADIUS
 H = 200  # HEIGHT OF THE BASE STATION
-# MAX RANGE FROM DRONE TO BASE STATION FOUND USING THE D2B_pathloss FUNCTION
+# MAX RANGE FROM DRONE TO BASE STATION
 total_r_db = 1280
 max_R_DB = total_r_db + 400  # TOTAL OPERATIONAL RANGE OF DRONES
 # FINDING THE MAXIMUM COVERAGE RADIUS OF DRONES WHEN THE THITA_OPT AND PATHLOSS THRESHOLD IS KNOWN
@@ -99,7 +98,7 @@ def D2B_pathloss(x):  # x IS A VECTOR REPRESENTING ONE FLY COORDINATES
         # DISTANCE BETWEEN DRONE AND BASE STATION
         r_db = math.sqrt((bs_xcoor - x_d) ** 2 + (bs_ycoor - y_d) ** 2)
         # DRONE TO BASE PATHLOSS
-        PL = 10 * alpha * math.log10(r_db) + A * ((thita - thita_zero) * math.exp((thita_zero - thita) / B)) + n_zero
+        PL = 10 * alpha * math.log10(r_db) + A * ((0 - thita_zero) * math.exp((thita_zero - 0) / B)) + n_zero
         # CHECKING IF THE PATHLOSS IS WITHIN THE PATHLOSS THRESHOLD
         # IF PATHLOSS IS WITH THE BOUNDS RETURN THE MAX DISTANCE
         if PL <= PL_D2B_max:
@@ -126,14 +125,6 @@ def f(x):  # x IS A VECTOR REPRESENTING ONE FLY COORDINATES
                 yes += 1
     # RETURNS THE NUMBER OF USERS COVERED BY A DRONE/FLY
     return yes / N
-
-
-def range_test(x):
-    no = 0
-    for k in x:
-        if 800 > k > 0:
-            no += 1
-    return no
 
 
 # MAIN DFO LOOP
@@ -168,54 +159,24 @@ for itr in range(1, maxIterations):
         # AFTER EVERY 150 ITERATIONS
         print("Iteration:", itr, "\tUsers covered:", fitness[s])
         # STORING THE CURRENT BEST FLY X AND Y COORDINATES
-        bd.append((X[s, 0], X[s, 1]))
-        x_d = X[s, 0]  # CURRENT BEST FLY/DRONE X COORDINATE
-        y_d = X[s, 1]  # CURRENT BEST FLY/DRONE Y COORDINATE
-        for j, k in bd:
-            x_coor = j  # PREVIOUS BEST FLY/DRONE Y COORDINATE
-            y_coor = k  # PREVIOUS BEST FLY/DRONE Y COORDINATE
-            ran = math.sqrt((x_d - x_coor) ** 2 + (y_d - y_coor) ** 2)
-            # SAVING THE DISTANCE BETWEEN CURRENT AND PREVIOUS BEST DRONE
-            r_dd.append(ran)
-
-        if range_test(r_dd) >= 1:
-            for i in range(N):
-                for it in coordinates:
-                    x_i = it[0]  # USER X COORDINATE
-                    y_i = it[1]  # USER Y COORDINATE
-                    x_d = X[s, 0]  # DRONE/FLY X COORDINATE
-                    y_d = X[s, 1]  # DRONE/FLU Y COORDINATE
-                    # DRONE COVERAGE
-                    coverage = ((x_i - x_d) ** 2 + (y_i - y_d) ** 2)
-                    # DRONE TO BASE STATION DISTANCE
-                    r_db = math.sqrt((bs_xcoor - x_d) ** 2 + (bs_ycoor - y_d) ** 2)
-                    if coverage <= r * r and r_db <= total_r_db:
-                        # REMOVING THE COVERED FROM THE SEARCH SPACE
-                        coordinates.remove((x_i, y_i))
-                # for d in range(D):  # UPDATE EACH DIMENSION SEPARATELY
-                #     X[i, d] = np.random.uniform(lowerB[d], upperB[d])
-            print("Users Removed")
-        elif range_test(r_dd) == 0:
-            for i in range(N):
-                for it in coordinates:
-                    x_i = it[0]  # USER X COORDINATE
-                    y_i = it[1]  # USER Y COORDINATE
-                    x_d = X[s, 0]  # DRONE/FLY X COORDINATE
-                    y_d = X[s, 1]  # DRONE/FLU Y COORDINATE
-                    # DRONE COVERAGE
-                    coverage = ((x_i - x_d) ** 2 + (y_i - y_d) ** 2)
-                    # DRONE TO BASE STATION DISTANCE
-                    r_db = math.sqrt((bs_xcoor - x_d) ** 2 + (bs_ycoor - y_d) ** 2)
-                    if coverage <= r * r and r_db <= 1280:
-                        # SAVING COVERED USERS AND ASSOCIATED DRONE
-                        cov_ud.append(((x_d, y_d, h), (x_i, y_i)))
-                        # SAVING COVERED USERS
-                        cov.append((x_i, y_i))
-                        # REMOVING THE COVERED FROM THE SEARCH SPACE
-                        coordinates.remove((x_i, y_i))
-            print("Users Stored and removed")
-    # CLEARING THE ARRAY FOR NEXT ITERATION
-    r_dd.clear()
+        for i in range(N):
+            for it in coordinates:
+                x_i = it[0]  # USER X COORDINATE
+                y_i = it[1]  # USER Y COORDINATE
+                x_d = X[s, 0]  # DRONE/FLY X COORDINATE
+                y_d = X[s, 1]  # DRONE/FLU Y COORDINATE
+                # DRONE COVERAGE
+                coverage = ((x_i - x_d) ** 2 + (y_i - y_d) ** 2)
+                # DRONE TO BASE STATION DISTANCE
+                r_db = math.sqrt((bs_xcoor - x_d) ** 2 + (bs_ycoor - y_d) ** 2)
+                if coverage <= r * r and r_db <= 1280:
+                    # SAVING COVERED USERS AND ASSOCIATED DRONE
+                    cov_ud.append(((x_d, y_d, h), (x_i, y_i)))
+                    # SAVING COVERED USERS
+                    cov.append((x_i, y_i))
+                    # REMOVING THE COVERED FROM THE SEARCH SPACE
+                    coordinates.remove((x_i, y_i))
+        print("Users Stored and removed")
 
     # STORING THE COORDINATES
     d = {}
@@ -247,7 +208,7 @@ for itr in range(1, maxIterations):
         bNeighbour = right if fitness[right] < fitness[left] else left
 
         for d in range(D):  # UPDATE EACH DIMENSION SEPARATELY
-            if np.random.rand() < delta or range_test(r_dd) >= 1:
+            if np.random.rand() < delta:
                 X[i, d] = np.random.uniform(lowerB[d], upperB[d])
                 continue
 
@@ -255,7 +216,7 @@ for itr in range(1, maxIterations):
             X[i, d] = X[bNeighbour, d] + u * (X[bNeighbour, d] - X[i, d])
 
             # OUT OF BOUND CONTROL
-            if X[i, d] < lowerB[d] or X[i, d] > upperB[d] or range_test(r_dd) >= 1:
+            if X[i, d] < lowerB[d] or X[i, d] > upperB[d]:
                 X[i, d] = np.random.uniform(lowerB[d], upperB[d])
 
     # PLOTTING
