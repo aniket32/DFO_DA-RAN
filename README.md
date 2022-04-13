@@ -2,7 +2,8 @@
 
 Drone Assisted Radio Access Networks(DA-RAN) implementation using Dispersed Flies Optimization(DFO)
 
-Run the DA-RAN.py file to generate csv and txt files needed for 2D plot
+Run the DFO DA-RAN.py file to generate csv and txt files needed for 2D plot
+Run the PLOT_2D.py to generate the final plots 
 
 Future work: 
 
