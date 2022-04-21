@@ -9,6 +9,7 @@ size = 20
 x_coor = np.random.randint(1000, 4000, size=size)
 y_coor = np.random.randint(1000, 4000, size=size)
 
+
 # LIMITS FOR THE PLOT
 x_limit = 5000
 y_limit = 5000

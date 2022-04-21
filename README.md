@@ -5,9 +5,18 @@ Drone Assisted Radio Access Networks(DA-RAN) implementation using Dispersed Flie
 Run the DFO DA-RAN.py file to generate csv and txt files needed for 2D plot
 Run the PLOT_2D.py to generate the final plots 
 
-Future work: 
 
-Implement power constraints and Trajectory Planning and Resource Allocation(TP-RA)
+
+DFO_DA-RAN_flaws.py is the implementation with inter-drone coverage, where all users inside the coverage region is
+covered but the users covered may experience some interference in their connection.
+
+DFO_DA-RAN_PPP.py is an updated version of DA-RAN where the users have been distributed using Poisson Point Process(PPP)
+method, this was added ona later date, all experiments and evaluation were done using DFO_DA-RAN.py where the users are
+distributed randomly. 
+
+Future work:
+Implement power constraints, Trajectory Planning and Resource Allocation(TP-RA), ability to chain drones,
+ability to hanover drone based on better position instead of removing the drones the overlap etc.
 
 
 
